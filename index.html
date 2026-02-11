@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13.12</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+overflow:hidden;
+background:radial-gradient(circle at bottom,#0d1b2a 0%,#000 100%);
+color:white;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+font-family:'Great Vibes',cursive;
+}
+
+/* Canvas */
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-2;
+}
+
+/* Glow */
+#glow{
+position:fixed;
+width:100%;
+height:100%;
+background:radial-gradient(circle at center,rgba(255,255,255,0.08),transparent 60%);
+z-index:-1;
+pointer-events:none;
+animation:glowMove 8s infinite alternate ease-in-out;
+}
+
+@keyframes glowMove{
+from{transform:scale(1);}
+to{transform:scale(1.2);}
+}
+
+/* Lock */
+#lock{position:absolute;z-index:10;}
+
+input{
+padding:12px 20px;
+border-radius:30px;
+border:none;
+font-size:18px;
+text-align:center;
+}
+
+button{
+margin-top:15px;
+padding:8px 20px;
+border:none;
+border-radius:20px;
+cursor:pointer;
+}
+
+.error{color:#ff6b6b;opacity:0;transition:0.3s;}
+
+/* Story */
+#story{
+position:absolute;
+font-size:2.8rem;
+max-width:85%;
+overflow:hidden;
+white-space:nowrap;
+}
+
+/* Schreib-Animation */
+.write{
+border-right:2px solid white;
+animation: blink 1s infinite;
+}
+
+@keyframes blink{
+50%{border-color:transparent;}
+}
+
+/* Finale */
+#final{
+position:absolute;
+font-size:3.8rem;
+opacity:0;
+text-shadow:0 0 40px white;
+transition:opacity 1.5s ease;
+}
+
+.pulse{
+animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.1);}
+100%{transform:scale(1);}
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div id="glow"></div>
+
+<div id="lock">
+<h2>Wann haben wir uns das erste mal Geliebt?</h2>
+<input type="password" id="pw">
+<br>
+<button onclick="check()">Öffnen</button>
+<div class="error" id="err">Du weißt es doch… ❤️</div>
+</div>
+
+<div id="story"></div>
+<div id="final">Ich liebe dich.</div>
+
+<script>
+
+/* PASSWORD */
+
+let unlocked=false;
+
+function check(){
+if(document.getElementById("pw").value==="13.12"){
+unlocked=true;
+document.getElementById("lock").style.display="none";
+showText();
+}else{
+let e=document.getElementById("err");
+e.style.opacity="1";
+setTimeout(()=>e.style.opacity="0",2000);
+}
+}
+
+/* STORY */
+
+const texts=[
+"Es gibt Momente...",
+"...die sich für immer einbrennen.",
+"Ein Blick.",
+"Eine Berührung.",
+"Ein Gefühl, das alles verändert.",
+"Seit dem 13.12. ist mein Herz nicht mehr dasselbe.",
+"Seit diesem Tag gibt es kein Zurück mehr.",
+"Du bist mein Zuhause.",
+"Du bist mein Frieden.",
+"Du bist mein für immer."
+];
+
+let index=0;
+let startX=null;
+
+function showText(){
+if(index>=texts.length){
+finale();
+return;
+}
+let s=document.getElementById("story");
+s.classList.add("write");
+s.style.width="0";
+s.innerHTML=texts[index];
+
+let length=texts[index].length;
+s.style.animation="none";
+
+setTimeout(()=>{
+s.style.transition="width 1.8s ease";
+s.style.width=length+"ch";
+},50);
+
+index++;
+}
+
+/* Swipe */
+
+document.addEventListener("click",()=>{
+if(unlocked) showText();
+});
+
+document.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX;
+});
+
+document.addEventListener("touchend",e=>{
+if(!unlocked) return;
+let endX=e.changedTouches[0].clientX;
+if(startX-endX>50){
+showText();
+}
+});
+
+/* STARFIELD */
+
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
+let mouseX=0;
+let mouseY=0;
+
+for(let i=0;i<300;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*1.5,
+speed:Math.random()*0.4
+});
+}
+
+document.addEventListener("mousemove",e=>{
+mouseX=e.clientX;
+mouseY=e.clientY;
+});
+
+document.addEventListener("touchmove",e=>{
+mouseX=e.touches[0].clientX;
+mouseY=e.touches[0].clientY;
+});
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+stars.forEach(s=>{
+s.y+=s.speed;
+
+let dx=(mouseX-canvas.width/2)*0.0007;
+let dy=(mouseY-canvas.height/2)*0.0007;
+
+ctx.beginPath();
+ctx.arc(s.x+dx*80,s.y+dy*80,s.r,0,Math.PI*2);
+ctx.fillStyle="white";
+ctx.fill();
+
+if(s.y>canvas.height){
+s.y=0;
+s.x=Math.random()*canvas.width;
+}
+});
+
+requestAnimationFrame(draw);
+}
+draw();
+
+/* FINALE */
+
+function finale(){
+document.getElementById("story").style.display="none";
+let f=document.getElementById("final");
+f.style.opacity="1";
+f.classList.add("pulse");
+massiveExplosion();
+}
+
+function massiveExplosion(){
+for(let i=0;i<200;i++){
+let star=document.createElement("div");
+star.style.position="absolute";
+star.style.width="4px";
+star.style.height="4px";
+star.style.background="white";
+star.style.borderRadius="50%";
+star.style.left="50%";
+star.style.top="50%";
+star.style.transition="1.8s ease-out";
+document.body.appendChild(star);
+
+setTimeout(()=>{
+star.style.left=(50+(Math.random()*200-100))+"%";
+star.style.top=(50+(Math.random()*200-100))+"%";
+star.style.opacity="0";
+},10);
+
+setTimeout(()=>star.remove(),1800);
+}
+}
+</script>
+</body>
+</html>
