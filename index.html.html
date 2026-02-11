@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Für Sidra ❤️</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ff4e8a, #ff0055);
+    overflow: hidden;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.page {
+    position: absolute;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: 0.8s ease;
+}
+
+.page.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+h1 {
+    font-size: 2.5em;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+}
+
+p {
+    font-size: 1.5em;
+}
+
+button {
+    margin-top: 30px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    background: white;
+    color: #ff0055;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+.heart {
+    position: absolute;
+    font-size: 20px;
+    animation: float 6s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) scale(1); opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="page active">
+    <h1>Für dich, Sidra ❤️</h1>
+    <button onclick="nextPage()">Weiter</button>
+</div>
+
+<div class="page">
+    <p>Seit du in meinem Leben bist…</p>
+    <button onclick="nextPage()">Weiter</button>
+</div>
+
+<div class="page">
+    <p>…ist alles heller, wärmer und schöner.</p>
+    <button onclick="nextPage()">Weiter</button>
+</div>
+
+<div class="page">
+    <h1>Ich liebe dich Sidra ❤️</h1>
+</div>
+
+<script>
+let currentPage = 0;
+const pages = document.querySelectorAll('.page');
+
+function nextPage() {
+    pages[currentPage].classList.remove('active');
+    currentPage++;
+    if (currentPage < pages.length) {
+        pages[currentPage].classList.add('active');
+    }
+}
+
+// Herzen erzeugen
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+}
+
+setInterval(createHeart, 400);
+</script>
+
+</body>
+</html>
