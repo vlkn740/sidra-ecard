@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13.12</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+overflow:hidden;
+background:radial-gradient(ellipse at bottom,#0d1b2a 0%,#000 100%);
+color:white;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+font-family:'Dancing Script',cursive;
+}
+
+/* Canvas */
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* LOCK SCREEN */
+
+#lock{
+position:absolute;
+z-index:10;
+}
+
+input{
+padding:12px 20px;
+border-radius:30px;
+border:none;
+outline:none;
+text-align:center;
+font-size:18px;
+}
+
+button{
+margin-top:15px;
+padding:8px 20px;
+border:none;
+border-radius:20px;
+cursor:pointer;
+}
+
+.error{
+margin-top:10px;
+color:#ff6b6b;
+opacity:0;
+transition:0.3s;
+}
+
+/* STORY */
+
+#story{
+position:absolute;
+opacity:0;
+transition:opacity 1.5s ease;
+font-size:2.5rem;
+max-width:80%;
+}
+
+.slide{
+animation:slideIn 0.9s ease forwards;
+}
+
+@keyframes slideIn{
+from{transform:translateX(80px);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+
+/* FINAL */
+
+#final{
+position:absolute;
+font-size:3.2rem;
+opacity:0;
+text-shadow:0 0 25px white;
+transition:opacity 2s ease;
+}
+
+.pulse{
+animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div id="lock">
+<h2>Wann haben wir uns das erste mal Geliebt?</h2>
+<input type="password" id="pw">
+<br>
+<button onclick="check()">Öffnen</button>
+<div class="error" id="err">Du weißt es doch… ❤️</div>
+</div>
+
+<div id="story"></div>
+<div id="final">Ich liebe dich.</div>
+
+<script>
+
+/* ---------- PASSWORD ---------- */
+
+let unlocked = false;
+
+function check(){
+let val=document.getElementById("pw").value;
+if(val==="13.12"){
+unlocked=true;
+document.getElementById("lock").style.display="none";
+let story=document.getElementById("story");
+story.style.opacity="1";
+showText();
+}else{
+let e=document.getElementById("err");
+e.style.opacity="1";
+setTimeout(()=>e.style.opacity="0",2000);
+}
+}
+
+/* ---------- STORY ---------- */
+
+const texts=[
+"Es gibt Momente...",
+"...die alles verändern.",
+"Seit dem 13.12. schlägt mein Herz anders.",
+"Du bist mein Zuhause.",
+"Du bist mein Frieden.",
+"Du bist mein für immer."
+];
+
+let index=0;
+
+function showText(){
+if(index<texts.length){
+let s=document.getElementById("story");
+s.classList.remove("slide");
+void s.offsetWidth;
+s.innerHTML=texts[index];
+s.classList.add("slide");
+index++;
+}else{
+setTimeout(finale,1500);
+}
+}
+
+/* Swipe / Click nur wenn unlocked */
+
+document.addEventListener("click",()=>{
+if(unlocked) showText();
+});
+
+let startX=null;
+document.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX;
+});
+document.addEventListener("touchend",e=>{
+if(!unlocked) return;
+let endX=e.changedTouches[0].clientX;
+if(startX-endX>50) showText();
+});
+
+/* ---------- FINAL ---------- */
+
+function finale(){
+document.getElementById("story").style.display="none";
+let f=document.getElementById("final");
+f.style.opacity="1";
+f.classList.add("pulse");
+explode();
+}
+
+function explode(){
+for(let i=0;i<50;i++){
+let star=document.createElement("div");
+star.style.position="absolute";
+star.style.width="3px";
+star.style.height="3px";
+star.style.background="white";
+star.style.borderRadius="50%";
+star.style.left="50%";
+star.style.top="50%";
+star.style.transition="1.2s ease-out";
+document.body.appendChild(star);
+
+setTimeout(()=>{
+star.style.left=(50+(Math.random()*60-30))+"%";
+star.style.top=(50+(Math.random()*60-30))+"%";
+star.style.opacity="0";
+},10);
+
+setTimeout(()=>star.remove(),1200);
+}
+}
+
+/* ---------- STARFIELD ---------- */
+
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
+for(let i=0;i<250;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*1.5,
+speed:Math.random()*0.3
+});
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+stars.forEach(s=>{
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+ctx.fill();
+s.y+=s.speed;
+if(s.y>canvas.height){
+s.y=0;
+s.x=Math.random()*canvas.width;
+}
+});
+}
+
+setInterval(draw,33);
+
+/* Shooting Star */
+
+setInterval(()=>{
+let x=Math.random()*canvas.width;
+let y=Math.random()*canvas.height/2;
+ctx.beginPath();
+ctx.moveTo(x,y);
+ctx.lineTo(x+120,y+120);
+ctx.strokeStyle="white";
+ctx.lineWidth=2;
+ctx.stroke();
+},5000);
+
+</script>
+
+</body>
+</html>
