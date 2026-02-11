@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13.12.</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+background:black;
+color:white;
+overflow:hidden;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+
+/* Passwort Screen */
+
+#lockScreen{
+position:absolute;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+transition:opacity 1.5s ease;
+}
+
+input{
+padding:12px 20px;
+border:none;
+border-radius:30px;
+outline:none;
+font-size:16px;
+text-align:center;
+margin-top:20px;
+}
+
+button{
+margin-top:15px;
+padding:8px 20px;
+border:none;
+border-radius:20px;
+background:white;
+cursor:pointer;
+}
+
+.error{
+margin-top:15px;
+color:#ff6b6b;
+opacity:0;
+transition:0.5s;
+}
+
+/* Main Scene */
+
+#main{
+position:absolute;
+opacity:0;
+transition:opacity 2s ease;
+}
+
+.text{
+font-size:2rem;
+opacity:0;
+transform:scale(0.95);
+transition:opacity 2s ease, transform 2s ease;
+}
+
+.show{
+opacity:1;
+transform:scale(1);
+}
+
+/* Final Stars */
+
+#stars{
+position:absolute;
+width:100%;
+height:100%;
+background:black;
+overflow:hidden;
+display:none;
+}
+
+.star{
+position:absolute;
+width:2px;
+height:2px;
+background:white;
+border-radius:50%;
+animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle{
+from{opacity:0.2;}
+to{opacity:1;}
+}
+
+#finalText{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:3rem;
+opacity:0;
+transition:opacity 3s ease;
+text-shadow:0 0 20px rgba(255,255,255,0.8);
+}
+</style>
+</head>
+
+<body>
+
+<div id="lockScreen">
+<h2>Wann haben wir uns das erste mal Geliebt?</h2>
+<input type="password" id="password" placeholder="••••••">
+<button onclick="checkPassword()">Öffnen</button>
+<div class="error" id="error">Du weißt es doch… ❤️</div>
+</div>
+
+<div id="main">
+<div class="text" id="text"></div>
+</div>
+
+<div id="stars">
+<div id="finalText">Ich liebe dich.</div>
+</div>
+
+<script>
+
+function checkPassword(){
+let pw = document.getElementById("password").value;
+if(pw === "13.12."){
+document.getElementById("lockScreen").style.opacity="0";
+setTimeout(()=>{
+document.getElementById("lockScreen").style.display="none";
+startStory();
+},1500);
+}else{
+let err = document.getElementById("error");
+err.style.opacity="1";
+setTimeout(()=>{err.style.opacity="0";},2000);
+}
+}
+
+const messages = [
+"Es gibt Momente...",
+"...die ein ganzes Leben verändern.",
+"Seit dem 13.12. schlägt mein Herz anders.",
+"Du bist mein Zuhause.",
+"Du bist mein Frieden.",
+"Du bist meine Zukunft."
+];
+
+let index=0;
+
+function startStory(){
+document.getElementById("main").style.opacity="1";
+showNext();
+}
+
+function showNext(){
+if(index < messages.length){
+let textEl = document.getElementById("text");
+textEl.classList.remove("show");
+setTimeout(()=>{
+textEl.innerHTML = messages[index];
+textEl.classList.add("show");
+index++;
+setTimeout(showNext,3000);
+},1000);
+}else{
+setTimeout(startFinale,2000);
+}
+}
+
+function startFinale(){
+document.getElementById("main").style.display="none";
+let stars = document.getElementById("stars");
+stars.style.display="block";
+
+for(let i=0;i<150;i++){
+let star=document.createElement("div");
+star.classList.add("star");
+star.style.top=Math.random()*100+"%";
+star.style.left=Math.random()*100+"%";
+star.style.animationDuration=(1+Math.random()*3)+"s";
+stars.appendChild(star);
+}
+
+setTimeout(()=>{
+document.getElementById("finalText").style.opacity="1";
+},2000);
+}
+
+</script>
+
+</body>
+</html>
